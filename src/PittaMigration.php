@@ -153,7 +153,10 @@ class PittaMigration {
             extract($this->viewVars[$method]);
         }
         ob_start();
-        include $this->getPluginPath() . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $method . '.php';
+        /**
+         * Pull in the view file.
+         */
+        require_once $this->getPluginPath() . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $method . '.php';
         return do_shortcode(ob_get_clean());
     }
 
