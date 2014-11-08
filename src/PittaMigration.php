@@ -38,7 +38,8 @@ class PittaMigration {
         $this->pluginUrl = plugin_dir_url(__FILE__);
         $this->viewVars = array();
         \load_plugin_textdomain($this->textDomain, false, 'lang');
-        $this->run();
+        \add_action('admin_init', array(&$this, 'run'));
+        // $this->run();
     }
 
     /**
@@ -59,11 +60,11 @@ class PittaMigration {
      * Core code.
      * 
      * @since 0.2.0
-     * @access private
+     * @access public
      * 
      * @global wpdb $wpdb
      */
-    private function run() {
+    public function run() {
         global $wpdb;
 
         // these must be defined for it to work
@@ -88,6 +89,7 @@ class PittaMigration {
         $success = $this->updatePosts($fromHome, $sql);
 
         if ($success !== FALSE) {
+            $this->set('success', compact('$fromHome', '$fromSiteurl'));
             \add_action('admin_notices', array(&$this, 'success'));
         } else {
             /**
@@ -170,7 +172,16 @@ class PittaMigration {
      * @param array $vars
      */
     private function set($method, $vars) {
-        $this->viewVars[$method] = array_merge((array) $this->viewVars[$method], $vars);
+        if (isset($this->viewVars[$method])) {
+            $this->viewVars[$method] = array_merge($this->viewVars[$method], $vars);
+        } else {
+            $this->viewVars[$method] = $vars;
+        }
+        $this->log(print_r($vars, true));
+    }
+    
+    private function log($message) {
+        error_log('[pitta-migration] '.$message);
     }
 
     /**
