@@ -18,6 +18,8 @@ class PittaMigration {
 
     /**
      * Creates or returns an Singleton instance of this class.
+     * 
+     * @since 0.2.0
      */
     public static function getInstance() {
         // If an instance hasn't been created and set to $instance create an instance and set it to $instance.
@@ -34,12 +36,22 @@ class PittaMigration {
      * @access private
      */
     private function __construct() {
-        $this->pluginPath = plugin_dir_path(__FILE__);
-        $this->pluginUrl = plugin_dir_url(__FILE__);
+        $this->pluginPath = plugin_dir_path(dirname(__FILE__));
+        $this->pluginUrl = plugin_dir_url(dirname(__FILE__));
         $this->viewVars = array();
-        \load_plugin_textdomain($this->textDomain, false, 'lang');
+        /**
+         * @todo Create the language files
+         */
+        \load_plugin_textdomain($this->textDomain, false, dirname(plugin_basename(dirname(__FILE__))) . 'languages/');
+        $this->log($this->pluginPath);
+        
+        /** 
+         * Started coding the plugin as one big admin_notice 
+         * the coding is easier if it is
+         * but its more logical to run in admin_init
+         */
+        // \add_action('admin_notices', array(&$this, 'run'));
         \add_action('admin_init', array(&$this, 'run'));
-        // $this->run();
     }
 
     /**
@@ -69,50 +81,75 @@ class PittaMigration {
 
         // these must be defined for it to work
         if (!defined('WP_HOME') || !defined('WP_SITEURL')) {
+            // switch these if run is called as an admin_notice
+            // $this->setup();
             \add_action('admin_notices', array(&$this, 'setup'));
             return;
         }
 
-        // get the original home url
+        // get the originals direct from the database
         $fromHome = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name = 'home'");
         $fromSiteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'");
 
         // don't need to migrate if they're the same
-        if (WP_HOME == $fromHome && WP_SITEURL == $fromSiteurl) {
+        if (WP_HOME === $fromHome && WP_SITEURL === $fromSiteurl) {
             return;
         }
 
-        $this->updateOptions();
-
-        // update wp_posts
-        $sql = '';
-        $success = $this->updatePosts($fromHome, $sql);
-
-        if ($success !== FALSE) {
-            $this->set('success', compact('$fromHome', '$fromSiteurl'));
-            \add_action('admin_notices', array(&$this, 'success'));
-        } else {
-            /**
-             * @todo Does this pass through wpdb correctly?
-             */
-            $this->set('error', compact('sql', 'wpdb'));
-            \add_action('admin_notices', array(&$this, 'error'));
+        // update wp_posts first as its more likely to fail
+        if ($this->migratePosts($fromHome, $fromSiteurl)) {
+            // update wp_options
+            $this->migrateOptions();
         }
     }
 
     /**
-     * Update wp_options.
+     * Update relevant wp_options.
      * 
      * @since 0.2.0
      * @access private
      * 
      * @global wpdb $wpdb
+     * 
+     * @return boolean success
      */
-    private function updateOptions() {
+    private function migrateOptions() {
+        global $wpdb; // must pass this through
+        if (!$this->migrateOption('home', WP_HOME)) {
+            return false;
+        }
+        if (!$this->migrateOption('siteurl', WP_SITEURL)) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Update single wp_options row.
+     * 
+     * @since 0.2.0
+     * @access private
+     * 
+     * @global wpdb $wpdb
+     * 
+     * @param string $name
+     * @param string $value
+     * @return boolean success
+     */
+    private function migrateOption($name, $value) {
         global $wpdb;
         // update_option doesn't update the database
-        $wpdb->update($wpdb->options, array('option_value' => WP_HOME), array('option_name' => 'home'));
-        $wpdb->update($wpdb->options, array('option_value' => WP_SITEURL), array('option_name' => 'siteurl'));
+        $updatedSiteurl = $wpdb->update(
+                $wpdb->options, array('option_value' => $value), array('option_name' => $name)
+        );
+        if ($updatedSiteurl === false) {
+            $message = sprintf(__('Failed to update %s', 'pitta-migration'), "$wpdb->options '$name'");
+            $this->dbError($message);
+            return false;
+        } else {
+            return true;
+        }
+        
     }
 
     /**
@@ -124,25 +161,58 @@ class PittaMigration {
      * @global wpdb $wpdb
      * 
      * @param string $fromHome
-     * @param string $sql
-     * @return success
+     * @param string $fromSiteurl
+     * @return boolean success
      */
-    private function updatePosts($fromHome, &$sql) {
+    private function migratePosts($fromHome, $fromSiteurl) {
         global $wpdb;
 
-        $toHome = get_home_url();
         $sql = $wpdb->prepare(
-                "UPDATE $wpdb->posts
-                SET guid = REPLACE(guid, '%s', '%s')
-                WHERE guid LIKE '%s'
-                ", $fromHome, $toHome, $fromHome . '%'
+                "UPDATE $wpdb->posts SET guid = REPLACE(guid, '%s', '%s') WHERE guid LIKE '%s'", $fromHome, WP_HOME, $fromHome . '%'
         );
 
-        return $wpdb->query($sql);
+        $success = $wpdb->query($sql);
+        if ($success !== false) {
+            $this->set('success', compact('fromHome', 'fromSiteurl'));
+            // switch these if run is called as an admin_notice
+            // $this->success();
+            \add_action('admin_notices', array(&$this, 'success'));
+            return true;
+        } else {
+            $message = sprintf(__('Failed to update %s', 'pitta-migration'), "$wpdb->posts.guid");
+            $this->dbError($message);
+            return false;
+        }
     }
 
     /**
-     * Returns a rendered view file.
+     * Display a database error.
+     * 
+     * @since 0.2.0
+     * @access private
+     * 
+     * @global wpdb $wpdb
+     * 
+     * @param string $message
+     */
+    private function dbError($message) {
+        global $wpdb;
+        /**
+         * Have to print any error here before calling add_action
+         * 
+         * N.B. To future self = print_error returns false if $wpdb->show_errors is false
+         */
+        ob_start();
+        $wpdb->print_error();
+        $dbError = ob_get_clean();
+        $this->set('error', compact('dbError', 'message'));
+        // switch these if run is called as an admin_notice
+        // $this->error();
+        \add_action('admin_notices', array(&$this, 'error'));
+    }
+
+    /**
+     * Get a rendered view file.
      * 
      * @since 0.2.0
      * @access private
@@ -158,8 +228,8 @@ class PittaMigration {
         /**
          * Pull in the view file.
          */
-        require_once $this->getPluginPath() . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $method . '.php';
-        return do_shortcode(ob_get_clean());
+        require_once $this->getPluginPath() . 'src' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $method . '.php';
+        return \do_shortcode(ob_get_clean());
     }
 
     /**
@@ -179,9 +249,14 @@ class PittaMigration {
         }
         $this->log(print_r($vars, true));
     }
-    
+
+    /**
+     * Log it.
+     * 
+     * @param string $message
+     */
     private function log($message) {
-        error_log('[pitta-migration] '.$message);
+        error_log("[$this->textDomain] " . $message);
     }
 
     /**
