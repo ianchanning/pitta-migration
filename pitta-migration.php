@@ -1,14 +1,15 @@
 <?php
 
 /*
-  Plugin Name: Pitta Migration
-  Plugin URI: http://www.vsni.co.uk
-  Description: Migrate WordPress databases using WP_HOME and WP_SITEURL constants
-  Version: 0.1
-  Author: Ian Channing
-  Author URI: http://klever.co.uk
+ * Plugin Name: Pitta Migration
+ * Plugin URI: http://vsni.co.uk
+ * Description: Migrate WordPress databases using WP_HOME and WP_SITEURL constants
+ * Version: 0.2.0
+ * Author: Ian Channing
+ * Author URI: http://klever.co.uk
+ * License: GPL V3
  */
 
-include 'functions.php';
+require_once plugin_dir_path(__FILE__) . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PittaMigration.php';
 
-add_action('admin_notices', 'iccPittaMigrate');
+Pitta\Migration\PittaMigration::getInstance();
