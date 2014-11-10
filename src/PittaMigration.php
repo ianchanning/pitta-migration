@@ -43,7 +43,6 @@ class PittaMigration {
          * @todo Create the language files
          */
         \load_plugin_textdomain($this->textDomain, false, dirname(plugin_basename(dirname(__FILE__))) . 'languages/');
-        $this->log($this->pluginPath);
         
         /** 
          * Started coding the plugin as one big admin_notice 

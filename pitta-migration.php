@@ -4,9 +4,9 @@
  * Plugin Name: Pitta Migration
  * Plugin URI: http://vsni.co.uk
  * Description: Migrate WordPress databases using WP_HOME and WP_SITEURL constants
- * Version: 0.2.0
- * Author: Ian Channing
- * Author URI: http://klever.co.uk
+ * Version: 0.2.1
+ * Author: Ian Channing @ VSN International
+ * Author URI: http://vsni.co.uk
  * License: GPL V3
  */
 
