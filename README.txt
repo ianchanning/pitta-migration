@@ -3,7 +3,7 @@ Contributors: icc97
 Tags: backup, database, migrate, mysql, developer, db migration, website deploy, wordpress migration, migration
 Requires at least: 2.2
 Tested up to: 4.0
-Stable tag: 0.3.0
+Stable tag: 0.3.1
 License: GPL v3
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -78,6 +78,9 @@ Check the the plugin is active. If you're just restored a production database th
 Check if it has run, by looking in the `wp_options` table for home and siteurl, as sometimes the admin notice gets lost.
 
 == Changelog ==
+
+= 0.3.1 =
+* Bug fix: Missed off switching the setup view to stop using the `admin_notices` hook
 
 = 0.3.0 =
 * Bug fix: Switched to using `admin_notices` as the default hook instead of `admin_init` as the notice would sometimes not appear
