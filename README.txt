@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: icc97
-Tags: backup, database, migrate, mysql, developer, db migration, website deploy, wordpress migration,
+Tags: backup, database, migrate, mysql, developer, db migration, website deploy, wordpress migration, migration
 Requires at least: 2.2
 Tested up to: 4.0
-Stable tag: 1.0
-License: GPLv3
+Stable tag: 0.3.0
+License: GPL v3
 License URI: http://www.gnu.org/licenses/gpl.txt
 
 Migrate WordPress databases using WP_HOME and WP_SITEURL constants.
@@ -58,6 +58,8 @@ Coincidentally there is a bird called a [Pitta](https://en.wikipedia.org/wiki/Pi
 
 > The fairy pitta **migrates** from Korea, Japan, Taiwan and coastal China to Borneo.
 
+P.P.S. This plugin is based off the excellent [WordPress Plugin Boilerplate](https://github.com/theantichris/WordPress-Plugin-Boilerplate) from antichris on Github
+
 == Installation ==
 
 1. Upload `pitta-migration` directory to the `/wp-content/plugins/` directory
@@ -67,23 +69,25 @@ Coincidentally there is a bird called a [Pitta](https://en.wikipedia.org/wiki/Pi
 
 == Frequently Asked Questions ==
 
-= I've installed my database to migrate and set WP_HOME and WP_SITEURL but nothing happens =
+= I've imported my database to migrate and set WP_HOME and WP_SITEURL but nothing happens =
 
-Check the the plugin is active. If you're just restored a production database the plugin might have been deactivated there.
+Check the the plugin is active. If you're just restored a production database the plugin might have been deactivated there. 
 
-== Screenshots ==
+= It's active too... =
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets 
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png` 
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+Check if it has run, by looking in the `wp_options` table for home and siteurl, as sometimes the admin notice gets lost.
 
 == Changelog ==
 
+= 0.3.0 =
+* Bug fix: Switched to using `admin_notices` as the default hook instead of `admin_init` as the notice would sometimes not appear
+
+= 0.2.1 =
+* Removed excess logging
+
 = 0.2.0 =
 * Put the plugin into an object 
-* Used the [WordPress Plugin Boilerplate from antichris on Github](https://github.com/theantichris/WordPress-Plugin-Boilerplate)
+* Used the [WordPress Plugin Boilerplate](https://github.com/theantichris/WordPress-Plugin-Boilerplate) from antichris on Github
 
 = 0.1 =
 * The initial plugin that worked but was very basic
