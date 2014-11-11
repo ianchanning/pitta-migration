@@ -87,9 +87,9 @@ class PittaMigration {
 
         // these must be defined for it to work
         if (!defined('WP_HOME') || !defined('WP_SITEURL')) {
-            // switch these if run is called as an admin_notice
-            // $this->setup();
-            \add_action('admin_notices', array(&$this, 'setup'));
+            // switch these if run is called as an admin_notice (then call the method directly)
+            $this->setup();
+            // \add_action('admin_notices', array(&$this, 'setup'));
             return;
         }
 
@@ -180,7 +180,7 @@ class PittaMigration {
         $success = $wpdb->query($sql);
         if ($success !== false) {
             $this->set('success', compact('fromHome', 'fromSiteurl'));
-            // switch these if run is called as an admin_notice
+            // switch these if run is called as an admin_notice (then call the method directly)
             $this->success();
             // \add_action('admin_notices', array(&$this, 'success'));
             return true;
@@ -212,7 +212,7 @@ class PittaMigration {
         $wpdb->print_error();
         $dbError = ob_get_clean();
         $this->set('error', compact('dbError', 'message'));
-        // switch these if run is called as an admin_notice
+        // switch these if run is called as an admin_notice (then call the method directly)
         $this->error();
         // \add_action('admin_notices', array(&$this, 'error'));
     }
