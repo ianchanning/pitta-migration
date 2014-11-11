@@ -43,8 +43,8 @@ class PittaMigration {
          * @todo Create the language files
          */
         \load_plugin_textdomain($this->textDomain, false, dirname(plugin_basename(dirname(__FILE__))) . 'languages/');
-        
-        /** 
+
+        /**
          * Started coding the plugin as one big admin_notice 
          * the coding is easier if it is
          * but its more logical to run in admin_init
@@ -105,7 +105,15 @@ class PittaMigration {
         // update wp_posts first as its more likely to fail
         if ($this->migratePosts($fromHome, $fromSiteurl)) {
             // update wp_options
-            $this->migrateOptions();
+            if ($this->migrateOptions()) {
+                $this->set('success', compact('fromHome', 'fromSiteurl'));
+                // switch these if run is called as an admin_notice (then call the method directly)
+                $this->success();
+                // \add_action('admin_notices', array(&$this, 'success'));
+            } else {
+                $message = sprintf(__('Failed to update %s', 'pitta-migration'), "$wpdb->posts.guid");
+                $this->dbError($message);
+            }
         }
     }
 
@@ -129,7 +137,7 @@ class PittaMigration {
         }
         return true;
     }
-    
+
     /**
      * Update single wp_options row.
      * 
@@ -155,7 +163,6 @@ class PittaMigration {
         } else {
             return true;
         }
-        
     }
 
     /**
@@ -178,17 +185,7 @@ class PittaMigration {
         );
 
         $success = $wpdb->query($sql);
-        if ($success !== false) {
-            $this->set('success', compact('fromHome', 'fromSiteurl'));
-            // switch these if run is called as an admin_notice (then call the method directly)
-            $this->success();
-            // \add_action('admin_notices', array(&$this, 'success'));
-            return true;
-        } else {
-            $message = sprintf(__('Failed to update %s', 'pitta-migration'), "$wpdb->posts.guid");
-            $this->dbError($message);
-            return false;
-        }
+        return $success !== false;
     }
 
     /**
