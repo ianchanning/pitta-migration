@@ -48,9 +48,16 @@ class PittaMigration {
          * Started coding the plugin as one big admin_notice 
          * the coding is easier if it is
          * but its more logical to run in admin_init
+         * 
+         * @since 0.3.0 
+         * This is probably an abuse of 'since'...
+         * 
+         * I've now switched back to using admin_notices by default
+         * As admin_init can be run before the user is logged out when a database is imported
+         * Then the admin notice never appears
          */
-        // \add_action('admin_notices', array(&$this, 'run'));
-        \add_action('admin_init', array(&$this, 'run'));
+        \add_action('admin_notices', array(&$this, 'run'));
+        // \add_action('admin_init', array(&$this, 'run'));
     }
 
     /**
@@ -174,8 +181,8 @@ class PittaMigration {
         if ($success !== false) {
             $this->set('success', compact('fromHome', 'fromSiteurl'));
             // switch these if run is called as an admin_notice
-            // $this->success();
-            \add_action('admin_notices', array(&$this, 'success'));
+            $this->success();
+            // \add_action('admin_notices', array(&$this, 'success'));
             return true;
         } else {
             $message = sprintf(__('Failed to update %s', 'pitta-migration'), "$wpdb->posts.guid");
@@ -206,8 +213,8 @@ class PittaMigration {
         $dbError = ob_get_clean();
         $this->set('error', compact('dbError', 'message'));
         // switch these if run is called as an admin_notice
-        // $this->error();
-        \add_action('admin_notices', array(&$this, 'error'));
+        $this->error();
+        // \add_action('admin_notices', array(&$this, 'error'));
     }
 
     /**
@@ -246,7 +253,6 @@ class PittaMigration {
         } else {
             $this->viewVars[$method] = $vars;
         }
-        $this->log(print_r($vars, true));
     }
 
     /**
