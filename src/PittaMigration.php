@@ -23,7 +23,7 @@ class PittaMigration {
      */
     public static function getInstance() {
         // If an instance hasn't been created and set to $instance create an instance and set it to $instance.
-        if (null == self::$instance) {
+        if ( null == self::$instance ) {
             self::$instance = new self;
         }
         return self::$instance;
@@ -36,13 +36,9 @@ class PittaMigration {
      * @access private
      */
     private function __construct() {
-        $this->pluginPath = plugin_dir_path(dirname(__FILE__));
-        $this->pluginUrl = plugin_dir_url(dirname(__FILE__));
+        $this->pluginPath = plugin_dir_path( dirname( __FILE__ ) );
+        $this->pluginUrl = plugin_dir_url( dirname( __FILE__ ) );
         $this->viewVars = array();
-        /**
-         * @todo Create the language files
-         */
-        \load_plugin_textdomain($this->textDomain, false, dirname(plugin_basename(dirname(__FILE__))) . 'languages/');
 
         /**
          * Started coding the plugin as one big admin_notice 
@@ -56,8 +52,23 @@ class PittaMigration {
          * As admin_init can be run before the user is logged out when a database is imported
          * Then the admin notice never appears
          */
-        \add_action('admin_notices', array(&$this, 'run'));
-        // \add_action('admin_init', array(&$this, 'run'));
+        \add_action( 'admin_notices', array( &$this, 'loadPluginTextdomain' ) );
+        \add_action( 'admin_notices', array( &$this, 'run' ) );
+        // \add_action( 'admin_init', array( &$this, 'run' ) );
+    }
+
+    /**
+     * Translations
+     *
+     * @link http://geertdedeckere.be/article/loading-wordpress-language-files-the-right-way
+     * @since 0.4.0
+     * @access private
+     */
+    private function loadPluginTextdomain() {
+        // The "plugin_locale" filter is also used in load_plugin_textdomain()
+        $locale = apply_filters( 'plugin_locale', get_locale(), $this->textDomain );
+        \load_textdomain( $this->textDomain, WP_LANG_DIR . "/plugins/$this->textDomain-$locale.mo"  );
+        \load_plugin_textdomain( $this->textDomain, false, dirname( plugin_basename( dirname( __FILE__ ) ) ) . 'languages/' );
     }
 
     /**
@@ -86,33 +97,33 @@ class PittaMigration {
         global $wpdb;
 
         // these must be defined for it to work
-        if (!defined('WP_HOME') || !defined('WP_SITEURL')) {
-            // switch these if run is called as an admin_notice (then call the method directly)
+        if ( !defined( 'WP_HOME' ) || !defined( 'WP_SITEURL' ) ) {
+            // switch these if run is called as an admin_notice ( then call the method directly )
             $this->setup();
-            // \add_action('admin_notices', array(&$this, 'setup'));
+            // \add_action( 'admin_notices', array( &$this, 'setup' ) );
             return;
         }
 
         // get the originals direct from the database
-        $fromHome = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name = 'home'");
-        $fromSiteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'");
+        $fromHome = $wpdb->get_var( "SELECT option_value FROM $wpdb->options WHERE option_name = 'home'" );
+        $fromSiteurl = $wpdb->get_var( "SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'" );
 
         // don't need to migrate if they're the same
-        if (WP_HOME === $fromHome && WP_SITEURL === $fromSiteurl) {
+        if ( WP_HOME === $fromHome && WP_SITEURL === $fromSiteurl ) {
             return;
         }
 
         // update wp_posts first as its more likely to fail
-        if ($this->migratePosts($fromHome, $fromSiteurl)) {
+        if ( $this->migratePosts( $fromHome, $fromSiteurl ) ) {
             // update wp_options
-            if ($this->migrateOptions()) {
-                $this->set('success', compact('fromHome', 'fromSiteurl'));
-                // switch these if run is called as an admin_notice (then call the method directly)
+            if ( $this->migrateOptions() ) {
+                $this->set( 'success', compact( 'fromHome', 'fromSiteurl' ) );
+                // switch these if run is called as an admin_notice ( then call the method directly )
                 $this->success();
-                // \add_action('admin_notices', array(&$this, 'success'));
+                // \add_action( 'admin_notices', array( &$this, 'success' ) );
             } else {
-                $message = sprintf(__('Failed to update %s', 'pitta-migration'), "$wpdb->posts.guid");
-                $this->dbError($message);
+                $message = sprintf( __( 'Failed to update %s', 'pitta-migration' ), "$wpdb->posts.guid" );
+                $this->dbError( $message );
             }
         }
     }
@@ -129,10 +140,10 @@ class PittaMigration {
      */
     private function migrateOptions() {
         global $wpdb; // must pass this through
-        if (!$this->migrateOption('home', WP_HOME)) {
+        if ( !$this->migrateOption( 'home', WP_HOME ) ) {
             return false;
         }
-        if (!$this->migrateOption('siteurl', WP_SITEURL)) {
+        if ( !$this->migrateOption( 'siteurl', WP_SITEURL ) ) {
             return false;
         }
         return true;
@@ -150,15 +161,15 @@ class PittaMigration {
      * @param string $value
      * @return boolean success
      */
-    private function migrateOption($name, $value) {
+    private function migrateOption( $name, $value ) {
         global $wpdb;
         // update_option doesn't update the database
-        $updatedSiteurl = $wpdb->update(
-                $wpdb->options, array('option_value' => $value), array('option_name' => $name)
-        );
-        if ($updatedSiteurl === false) {
-            $message = sprintf(__('Failed to update %s', 'pitta-migration'), "$wpdb->options '$name'");
-            $this->dbError($message);
+        $updatedSiteurl = $wpdb->update( 
+                $wpdb->options, array( 'option_value' => $value ), array( 'option_name' => $name )
+         );
+        if ( $updatedSiteurl === false ) {
+            $message = sprintf( __( 'Failed to update %s', 'pitta-migration' ), "$wpdb->options '$name'" );
+            $this->dbError( $message );
             return false;
         } else {
             return true;
@@ -177,14 +188,14 @@ class PittaMigration {
      * @param string $fromSiteurl
      * @return boolean success
      */
-    private function migratePosts($fromHome, $fromSiteurl) {
+    private function migratePosts( $fromHome, $fromSiteurl ) {
         global $wpdb;
 
-        $sql = $wpdb->prepare(
-                "UPDATE $wpdb->posts SET guid = REPLACE(guid, '%s', '%s') WHERE guid LIKE '%s'", $fromHome, WP_HOME, $fromHome . '%'
-        );
+        $sql = $wpdb->prepare( 
+                "UPDATE $wpdb->posts SET guid = REPLACE( guid, '%s', '%s' ) WHERE guid LIKE '%s'", $fromHome, WP_HOME, $fromHome . '%'
+         );
 
-        $success = $wpdb->query($sql);
+        $success = $wpdb->query( $sql );
         return $success !== false;
     }
 
@@ -198,7 +209,7 @@ class PittaMigration {
      * 
      * @param string $message
      */
-    private function dbError($message) {
+    private function dbError( $message ) {
         global $wpdb;
         /**
          * Have to print any error here before calling add_action
@@ -208,10 +219,10 @@ class PittaMigration {
         ob_start();
         $wpdb->print_error();
         $dbError = ob_get_clean();
-        $this->set('error', compact('dbError', 'message'));
-        // switch these if run is called as an admin_notice (then call the method directly)
+        $this->set( 'error', compact( 'dbError', 'message' ) );
+        // switch these if run is called as an admin_notice ( then call the method directly )
         $this->error();
-        // \add_action('admin_notices', array(&$this, 'error'));
+        // \add_action( 'admin_notices', array( &$this, 'error' ) );
     }
 
     /**
@@ -223,16 +234,16 @@ class PittaMigration {
      * @param string $method
      * @return string
      */
-    private function renderView($method) {
-        if (isset($this->viewVars[$method])) {
-            extract($this->viewVars[$method]);
+    private function renderView( $method ) {
+        if ( isset( $this->viewVars[ $method ] ) ) {
+            extract( $this->viewVars[ $method ] );
         }
         ob_start();
         /**
          * Pull in the view file.
          */
         require_once $this->getPluginPath() . 'src' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $method . '.php';
-        return \do_shortcode(ob_get_clean());
+        return \do_shortcode( ob_get_clean() );
     }
 
     /**
@@ -244,11 +255,11 @@ class PittaMigration {
      * @param string $method
      * @param array $vars
      */
-    private function set($method, $vars) {
-        if (isset($this->viewVars[$method])) {
-            $this->viewVars[$method] = array_merge($this->viewVars[$method], $vars);
+    private function set( $method, $vars ) {
+        if ( isset( $this->viewVars[ $method ] ) ) {
+            $this->viewVars[ $method ] = array_merge( $this->viewVars[ $method ], $vars );
         } else {
-            $this->viewVars[$method] = $vars;
+            $this->viewVars[ $method ] = $vars;
         }
     }
 
@@ -257,8 +268,8 @@ class PittaMigration {
      * 
      * @param string $message
      */
-    private function log($message) {
-        error_log("[$this->textDomain] " . $message);
+    private function log( $message ) {
+        error_log( "[ $this->textDomain ] " . $message );
     }
 
     /**
@@ -271,10 +282,10 @@ class PittaMigration {
      */
     public function success() {
         global $wpdb;
-        $newHome = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name = 'home'");
-        $newSiteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'");
-        $this->set(__FUNCTION__, compact('newHome', 'newSiteurl'));
-        echo $this->renderView(__FUNCTION__);
+        $newHome = $wpdb->get_var( "SELECT option_value FROM $wpdb->options WHERE option_name = 'home'" );
+        $newSiteurl = $wpdb->get_var( "SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'" );
+        $this->set( __FUNCTION__, compact( 'newHome', 'newSiteurl' ) );
+        echo $this->renderView( __FUNCTION__ );
     }
 
     /**
@@ -284,7 +295,7 @@ class PittaMigration {
      * @access private
      */
     public function error() {
-        echo $this->renderView(__FUNCTION__);
+        echo $this->renderView( __FUNCTION__ );
     }
 
     /**
@@ -294,7 +305,7 @@ class PittaMigration {
      * @access private
      */
     public function setup() {
-        echo $this->renderView(__FUNCTION__);
+        echo $this->renderView( __FUNCTION__ );
     }
 
 }

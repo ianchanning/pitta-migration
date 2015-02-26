@@ -1,0 +1,49 @@
+# Pitta Migration Pot
+# Copyright (C) 2015 VSN International
+# This file is distributed under the GNU General Public License v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Pitta Migration v1.0.0\n"
+"Report-Msgid-Bugs-To: Ian Channing <ian@ianchanning.com>\n"
+"POT-Creation-Date: 2015-02-26 23:13+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Your Name <you@example.com>\n"
+"Language-Team: Ian Channing <ian@ianchanning.com>\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Textdomain-Support: yesX-Generator: Poedit 1.6.4\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;esc_html_e;esc_html_x:1,2c;esc_html__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_attr__;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;"
+"_x:1,2c;_n:1,2;_n_noop:1,2;__ngettext:1,2;__ngettext_noop:1,2;_c,_nc:4c,1,2\n"
+"X-Poedit-Basepath: ../\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: src/PittaMigration.php:125 src/PittaMigration.php:171
+#, php-format
+msgid "Failed to update %s"
+msgstr ""
+
+#: src/views/error.php:2 src/views/setup.php:2 src/views/success.php:2
+msgid "Pitta Migration"
+msgstr ""
+
+#: src/views/error.php:2
+msgid "Error"
+msgstr ""
+
+#: src/views/setup.php:2
+msgid "Thanks for installing"
+msgstr ""
+
+#: src/views/setup.php:3
+msgid "Please add WP_HOME and WP_SITEURL to wp-config.php"
+msgstr ""
+
+#: src/views/success.php:2
+msgid "Success"
+msgstr ""
