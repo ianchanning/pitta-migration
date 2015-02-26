@@ -2,8 +2,8 @@
 Contributors: icc97, theantichris
 Tags: backup, database, migrate, mysql, developer, db migration, website deploy, wordpress migration, migration
 Requires at least: 2.2
-Tested up to: 4.0
-Stable tag: 0.3.3
+Tested up to: 4.1.1
+Stable tag: 0.3.4
 License: GPL v3
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -73,11 +73,20 @@ P.P.S. This plugin is based off the excellent [WordPress Plugin Boilerplate](htt
 
 Check the the plugin is active. If you're just restored a production database the plugin might have been deactivated there. 
 
+As soon as you activate the plugin it will try to do the migration.
+
 = It's active too... =
 
-Check if it has run, by looking in the `wp_options` table for home and siteurl, as sometimes the admin notice gets lost.
+Check if it has run, by looking in the `wp_options` table for home and siteurl, as the session might have had problems and not displayed the message.
+
+== Screenshots ==
+
+1. A successful migration message
 
 == Changelog ==
+
+= 0.3.4 =
+* Improvement: Add in a screenshot
 
 = 0.3.3 =
 * Bug fix: The 'migrated to' URLs were showing the old ones
