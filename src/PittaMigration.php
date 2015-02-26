@@ -40,11 +40,11 @@ class PittaMigration {
         $this->pluginUrl = plugin_dir_url( dirname( __FILE__ ) );
         $this->viewVars = array();
 
+        \add_action( 'init', array( &$this, 'loadPluginTextdomain' ) );
         /**
          * We use admin_notices as admin_init can be run before the user is logged out when a database is imported
          * Then the admin notice never appears
          */
-        \add_action( 'admin_notices', array( &$this, 'loadPluginTextdomain' ) );
         \add_action( 'admin_notices', array( &$this, 'run' ) );
     }
 
@@ -53,12 +53,12 @@ class PittaMigration {
      *
      * @link http://geertdedeckere.be/article/loading-wordpress-language-files-the-right-way
      * @since 0.4.0
-     * @access private
+     * @access public
      */
-    private function loadPluginTextdomain() {
+    public function loadPluginTextdomain() {
         // The "plugin_locale" filter is also used in load_plugin_textdomain()
         $locale = apply_filters( 'plugin_locale', get_locale(), $this->textDomain );
-        \load_textdomain( $this->textDomain, WP_LANG_DIR . "/plugins/$this->textDomain-$locale.mo"  );
+        \load_textdomain( $this->textDomain, WP_LANG_DIR . "/$this->textDomain/$this->textDomain-$locale.mo"  );
         \load_plugin_textdomain( $this->textDomain, false, dirname( plugin_basename( dirname( __FILE__ ) ) ) . 'languages/' );
     }
 
@@ -88,7 +88,7 @@ class PittaMigration {
         global $wpdb;
 
         // these must be defined for it to work
-        if ( !defined( 'WP_HOME' ) || !defined( 'WP_SITEURL' ) ) {
+        if ( ! defined( 'WP_HOME' ) || ! defined( 'WP_SITEURL' ) ) {
             $this->setup();
             return;
         }
