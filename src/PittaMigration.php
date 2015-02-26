@@ -41,20 +41,11 @@ class PittaMigration {
         $this->viewVars = array();
 
         /**
-         * Started coding the plugin as one big admin_notice 
-         * the coding is easier if it is
-         * but its more logical to run in admin_init
-         * 
-         * @since 0.3.0 
-         * This is probably an abuse of 'since'...
-         * 
-         * I've now switched back to using admin_notices by default
-         * As admin_init can be run before the user is logged out when a database is imported
+         * We use admin_notices as admin_init can be run before the user is logged out when a database is imported
          * Then the admin notice never appears
          */
         \add_action( 'admin_notices', array( &$this, 'loadPluginTextdomain' ) );
         \add_action( 'admin_notices', array( &$this, 'run' ) );
-        // \add_action( 'admin_init', array( &$this, 'run' ) );
     }
 
     /**
@@ -98,9 +89,7 @@ class PittaMigration {
 
         // these must be defined for it to work
         if ( !defined( 'WP_HOME' ) || !defined( 'WP_SITEURL' ) ) {
-            // switch these if run is called as an admin_notice ( then call the method directly )
             $this->setup();
-            // \add_action( 'admin_notices', array( &$this, 'setup' ) );
             return;
         }
 
@@ -118,9 +107,7 @@ class PittaMigration {
             // update wp_options
             if ( $this->migrateOptions() ) {
                 $this->set( 'success', compact( 'fromHome', 'fromSiteurl' ) );
-                // switch these if run is called as an admin_notice ( then call the method directly )
                 $this->success();
-                // \add_action( 'admin_notices', array( &$this, 'success' ) );
             } else {
                 $message = sprintf( __( 'Failed to update %s', 'pitta-migration' ), "$wpdb->posts.guid" );
                 $this->dbError( $message );
@@ -220,9 +207,7 @@ class PittaMigration {
         $wpdb->print_error();
         $dbError = ob_get_clean();
         $this->set( 'error', compact( 'dbError', 'message' ) );
-        // switch these if run is called as an admin_notice ( then call the method directly )
         $this->error();
-        // \add_action( 'admin_notices', array( &$this, 'error' ) );
     }
 
     /**
