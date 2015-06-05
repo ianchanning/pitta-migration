@@ -2,7 +2,7 @@
 Contributors: icc97, theantichris
 Tags: backup, database, migrate, mysql, developer, db migration, website deploy, wordpress migration, migration
 Requires at least: 2.2
-Tested up to: 4.1.1
+Tested up to: 4.2.2
 Stable tag: 0.4.1
 License: GPL v3
 License URI: http://www.gnu.org/licenses/gpl.txt
