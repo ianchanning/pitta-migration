@@ -4,7 +4,7 @@ namespace Pitta\Migration;
 
 /**
  * Database Migration Object
- * 
+ *
  * @package PittaMigration
  * @since 0.2.0
  */
@@ -18,7 +18,7 @@ class PittaMigration {
 
     /**
      * Creates or returns an Singleton instance of this class.
-     * 
+     *
      * @since 0.2.0
      */
     public static function getInstance() {
@@ -31,7 +31,7 @@ class PittaMigration {
 
     /**
      * Start me up...
-     * 
+     *
      * @since 0.2.0
      * @access private
      */
@@ -78,10 +78,10 @@ class PittaMigration {
 
     /**
      * Core code.
-     * 
+     *
      * @since 0.2.0
      * @access public
-     * 
+     *
      * @global wpdb $wpdb
      */
     public function run() {
@@ -117,12 +117,12 @@ class PittaMigration {
 
     /**
      * Update relevant wp_options.
-     * 
+     *
      * @since 0.2.0
      * @access private
-     * 
+     *
      * @global wpdb $wpdb
-     * 
+     *
      * @return boolean success
      */
     private function migrateOptions() {
@@ -138,12 +138,12 @@ class PittaMigration {
 
     /**
      * Update single wp_options row.
-     * 
+     *
      * @since 0.2.0
      * @access private
-     * 
+     *
      * @global wpdb $wpdb
-     * 
+     *
      * @param string $name
      * @param string $value
      * @return boolean success
@@ -151,7 +151,7 @@ class PittaMigration {
     private function migrateOption( $name, $value ) {
         global $wpdb;
         // update_option doesn't update the database
-        $updatedSiteurl = $wpdb->update( 
+        $updatedSiteurl = $wpdb->update(
                 $wpdb->options, array( 'option_value' => $value ), array( 'option_name' => $name )
          );
         if ( $updatedSiteurl === false ) {
@@ -165,12 +165,12 @@ class PittaMigration {
 
     /**
      * Update wp_posts.
-     * 
+     *
      * @since 0.2.0
      * @access private
-     * 
+     *
      * @global wpdb $wpdb
-     * 
+     *
      * @param string $fromHome
      * @param string $fromSiteurl
      * @return boolean success
@@ -178,7 +178,7 @@ class PittaMigration {
     private function migratePosts( $fromHome, $fromSiteurl ) {
         global $wpdb;
 
-        $sql = $wpdb->prepare( 
+        $sql = $wpdb->prepare(
                 "UPDATE $wpdb->posts SET guid = REPLACE( guid, '%s', '%s' ) WHERE guid LIKE '%s'", $fromHome, WP_HOME, $fromHome . '%'
          );
 
@@ -188,19 +188,19 @@ class PittaMigration {
 
     /**
      * Display a database error.
-     * 
+     *
      * @since 0.2.0
      * @access private
-     * 
+     *
      * @global wpdb $wpdb
-     * 
+     *
      * @param string $message
      */
     private function dbError( $message ) {
         global $wpdb;
         /**
          * Have to print any error here before calling add_action
-         * 
+         *
          * N.B. To future self = print_error returns false if $wpdb->show_errors is false
          */
         ob_start();
@@ -212,10 +212,10 @@ class PittaMigration {
 
     /**
      * Get a rendered view file.
-     * 
+     *
      * @since 0.2.0
      * @access private
-     * 
+     *
      * @param string $method
      * @return string
      */
@@ -233,10 +233,10 @@ class PittaMigration {
 
     /**
      * Merges arrays of vars for a particular method.
-     * 
+     *
      * @since 0.2.0
      * @access private
-     * 
+     *
      * @param string $method
      * @param array $vars
      */
@@ -250,7 +250,7 @@ class PittaMigration {
 
     /**
      * Log it.
-     * 
+     *
      * @param string $message
      */
     private function log( $message ) {
@@ -259,10 +259,10 @@ class PittaMigration {
 
     /**
      * Success admin message.
-     * 
+     *
      * @since 0.2.0
      * @access private
-     * 
+     *
      * @global wpdb $wpdb
      */
     public function success() {
@@ -275,7 +275,7 @@ class PittaMigration {
 
     /**
      * Error admin message.
-     * 
+     *
      * @since 0.2.0
      * @access private
      */
@@ -285,7 +285,7 @@ class PittaMigration {
 
     /**
      * Setup admin message.
-     * 
+     *
      * @since 0.2.0
      * @access private
      */
