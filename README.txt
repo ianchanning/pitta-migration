@@ -39,7 +39,7 @@ Most developers have their own methods for exporting/importing the database -
 if you can use `mysqldump` then you probably don't want a WordPress plugin to
 do it for you.
 
-It makes no assumptions about your database and its cross platform.
+It makes no assumptions about your database and it's cross platform.
 
 P.S. Pitta is taken from the start of an [answer from WordPress SE](http://wordpress.stackexchange.com/a/182/5433):
 
