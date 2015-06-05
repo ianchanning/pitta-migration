@@ -54,9 +54,9 @@ mention that Pitta can also be spelled pita).
 Its inspiration actually comes from the [second answer](http://wordpress.stackexchange.com/q/119/5433)
 from the same [WordPress SE question](http://wordpress.stackexchange.com/q/119/5433).
 
-Coincidentally there is a bird called a [Pitta](https://en.wikipedia.org/wiki/Pitta):
+Coincidentally there is a migratory bird called a [Pitta](https://en.wikipedia.org/wiki/Pitta):
 
-> The fairy pitta **migrates** from Korea, Japan, Taiwan and coastal China to Borneo.
+> The fairy pitta migrates from Korea, Japan, Taiwan and coastal China to Borneo.
 
 P.P.S. This plugin is based off the excellent [WordPress Plugin Boilerplate](https://github.com/theantichris/WordPress-Plugin-Boilerplate) from antichris on Github
 
