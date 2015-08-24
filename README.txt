@@ -2,8 +2,8 @@
 Contributors: icc97, theantichris
 Tags: backup, database, migrate, mysql, developer, db migration, website deploy, wordpress migration, migration
 Requires at least: 2.2
-Tested up to: 4.2.2
-Stable tag: 0.4.1
+Tested up to: 4.3
+Stable tag: 0.4.2
 License: GPL v3
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -84,6 +84,9 @@ Check if it has run, by looking in the `wp_options` table for home and siteurl, 
 1. A successful migration message
 
 == Changelog ==
+
+= 0.4.2 =
+* Bug fix: Mark tested for WordPress v4.3, crop the screenshot
 
 = 0.4.1 =
 * Bug fix: Update this change log, remove trailing spaces
